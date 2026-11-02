@@ -2,8 +2,8 @@
 Repo for Final Project of ECE 3720
 
 Group Members: 
-Kazuki Takenouchi
-Jonathan Russell
+Kazuki Takenouchi,
+Jonathan Russell,
 Cameron McIntosh
 
 Required Hardware:
