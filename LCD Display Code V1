@@ -1,0 +1,51 @@
+// ECE 3720 BattleShip
+
+#include <hidef.h>
+#include "derivative.h"
+
+#define RS_PIN   0x01     // PT0 
+#define RW_PIN   0x02     // PT1 
+#define E_PIN    0x04     // PT2 
+
+void short_delay(void)
+{
+    int i;
+    for (i = 0; i < 10; i++) {
+    }
+}
+
+void delay_ms(int ms)
+{
+    int i, j;
+    for (i = 0; i < ms; i++) {       
+        for (j = 0; j < 4000; j++) {  
+        }
+    }
+}
+
+void send_Byte(unsigned char b){
+  int i;
+  for(i=0;i<8;i++){
+    if (b & 0x80) {
+      PTT = PTT | RW_PIN;      
+    } else {
+      PTT = PTT & ~RW_PIN;      
+    }
+    short_delay();           
+   PTT = PTT | E_PIN;        
+    short_delay();             
+    PTT = PTT & ~E_PIN;        
+    b = b << 1;                
+  }
+}
+
+void main(void)
+{
+  DDRT = DDRT | RS_PIN | RW_PIN | E_PIN;       
+  PTT  = PTT & ~(RS_PIN | RW_PIN | E_PIN);     
+
+  send_Byte(0xA5);     //TEST RUN       
+
+  for (;;) {                   
+  }
+}
