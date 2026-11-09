@@ -39,12 +39,30 @@ void send_Byte(unsigned char b){
   }
 }
 
+void send_cmd(unsigned char c){
+  PTT = PTT | RS_PIN;            
+  send_Byte(0xF8);             
+  send_Byte(c & 0xF0);        
+  send_Byte((c << 4) & 0xF0); 
+  PTT = PTT & ~RS_PIN;           
+  delay_ms(1);                  
+}
+void lcd_start(void){
+  delay_ms(50);      
+  send_cmd(0x30);    // ALl commands were written in the datasheet, also there is a sheet in the shared drive for the command list I created
+  send_cmd(0x30);  
+  send_cmd(0x0C);     
+  send_cmd(0x01);   
+  delay_ms(12);       
+  send_cmd(0x06);     
+}
 void main(void)
 {
   DDRT = DDRT | RS_PIN | RW_PIN | E_PIN;       
   PTT  = PTT & ~(RS_PIN | RW_PIN | E_PIN);     
 
-  send_Byte(0xA5);     //TEST RUN       
+    lcd_start();
+    send_data('A');     //TEST RUN       
 
   for (;;) {                   
   }
