@@ -1,0 +1,107 @@
+#include <hidef.h>      /* common defines and macros */
+#include "derivative.h"      /* derivative-specific definitions */
+
+
+
+/*
+ * setup.c  -  Part 2: SETUP
+ * Dragon12 (MC9S12DG256), CodeWarrior C
+ *
+ * Uses the serial functions from connect.c (same project).
+ *
+ * SETUP sequence (after all 4 ships are placed):
+ *   1. Both boards send "READY" until both are ready
+ *      (same handshake as "HELLO" in connect.c).
+ *      If the 2:00 timer runs out first -> return 0 (restart setup).
+ *   2. Exchange ship maps, one board at a time:
+ *        Player 1 sends "M" + 64 characters, Player 2 answers "ACK"
+ *        Player 2 sends "M" + 64 characters, Player 1 answers "ACK"
+ */
+
+#define MY_ID        1     /* <-- 1 on one board (Player 1, attacks first), 2 on the other */
+#define LISTEN_TIME  30000 /* how long to listen before sending again */
+
+/* ------------------------------------------------------------------ */
+void          sci0_send_char(char c);
+void          sci0_send_string(char *s);
+unsigned char sci0_char_ready(void);
+char          sci0_read_char(void);
+char          sci0_wait_char(void);
+void          clear_last(void);
+void          remember_char(char c);
+unsigned char got_word(char *word);
+unsigned char handshake(char *word, unsigned char use_timer);
+
+/* Ship maps: index = (row-1)*8 + (col-1)
+   '0' = water, '1'..'4' = ship number */
+char my_map[64];           /* my ships                               */
+char opp_map[64];          /* opponent's ships (filled by comm_setup) */
+
+/* ------------------------------------------------------------------ */
+/*  Send / receive a message with "ACK"  (also used by attack.c)       */
+
+
+/*
+ * Send a message and keep resending it until the other board says "ACK".
+ * The message is: one start letter + 'length' characters of data.
+ */
+void send_until_ack(char start, char *data, unsigned char length)
+{
+    unsigned char i;
+    unsigned int  wait;
+
+    for (;;) {
+        /* send the message */
+        sci0_send_char(start);
+        for (i = 0; i < length; i++) {
+            sci0_send_char(data[i]);
+        }
+
+        /* listen for "ACK" */
+        clear_last();
+        for (wait = 0; wait < LISTEN_TIME; wait++) {
+            if (sci0_char_ready()) {
+                remember_char(sci0_read_char());
+                if (got_word("ACK")) return;   /* delivered */
+            }
+        }
+        /* no ACK -> loop and send again */
+    }
+}
+
+/*
+ * Wait for a message that begins with 'start', store the next
+ * 'length' characters in data[], then answer "ACK".
+ */
+void receive_and_ack(char start, char *data, unsigned char length)
+{
+    unsigned char i;
+
+    while (sci0_wait_char() != start) { }   /* skip until the start letter */
+
+    for (i = 0; i < length; i++) {
+        data[i] = sci0_wait_char();
+    }
+    sci0_send_string("ACK");
+}
+
+/* ------------------------------------------------------------------ */
+/*  SETUP  */
+
+unsigned char comm_setup(void)
+{
+    /* 1. Both boards READY? */
+    if (handshake("READY", 1) == 0) {
+        return 0;                   /* timer expired -> restart setup */
+    }
+
+    /* 2. Exchange ship locations, taking turns so both don't talk at once */
+    if (MY_ID == 1) {
+        send_until_ack('M', my_map, 64);
+        receive_and_ack('M', opp_map, 64);
+    } else {
+        receive_and_ack('M', opp_map, 64);
+        send_until_ack('M', my_map, 64);
+    }
+    return 1;
+}
