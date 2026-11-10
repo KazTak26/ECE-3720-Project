@@ -1,0 +1,30 @@
+/* full button press and release */
+
+static void waitForSW5(void)
+{
+    /* Wait til SW5 is pressed, input is low once the button is pressed. */
+    for (;;) {
+        while (PTH & SW5_MASK) {
+            _FEED_COP();
+        }
+
+        debounce();
+
+        if (!(PTH & SW5_MASK)) {
+            break;
+        }
+    }
+
+    /* Wait until SW5 is released. */
+    for (;;) {
+        while (!(PTH & SW5_MASK)) {
+            _FEED_COP();
+        }
+
+        debounce();
+
+        if (PTH & SW5_MASK) {
+            break;
+        }
+    }
+}
