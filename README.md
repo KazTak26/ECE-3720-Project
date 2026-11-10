@@ -12,12 +12,12 @@ Required Hardware:
 
 References: 
 
-AN2883.pdf 
+[1] Marciot, & Instructables. (2018, January 28). The secrets of an inexpensive, ubiquitous Chinese LCD. Instructables. https://www.instructables.com/The-Secrets-of-an-Inexpensive-Ubiquitous-Chinese-L/
 
-vanady1/Labyrinth_MCU_Game: C game for AVR microcontroller: grid-based maze, LED animations, button input and random item spawning. 
+[2]12864B v2.0 LCD module – CEPTIMUS. (n.d.). https://ceptimus.co.uk/index.php/2022/05/30/12864b-v2-0-lcd-module/
 
-Final Project Requirements.pdf – Inspiration for Idea(s)
+[3] Anthropic. (2026). Claude [Large language model]. https://claude.ai 
+Attached PDF has the Claude Transcript used to create the flow chart 
 
-switch statement - C - Battleship, random ship placement - Stack Overflow 
+[4] © Freescale Semiconductor, Inc., 2005. all rights reserved. (n.d.). https://www.nxp.com.cn/docs/en/application-note/AN2883.pdf
 
-Create Custom Animations on 16x2 LCD Displays - Hackster.io 
