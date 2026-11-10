@@ -56,6 +56,43 @@ void lcd_start(void){
   delay_ms(12);       
   send_cmd(0x06);     
 }
+
+void draw_grid(void){
+  int y, col;
+  unsigned char pixels;
+
+  send_cmd(0x36);                         
+
+  for (y = 0; y < 64; y++){
+
+    if (y < 32){                         
+      send_cmd(0x80 + y);
+      send_cmd(0x80);
+    } else {                               
+      send_cmd(0x80 + (y - 32));
+      send_cmd(0x88);
+    }
+
+    for (col = 0; col < 8; col++){        
+      if (y % 8 == 0 || y == 63){
+        pixels = 0xFF;                    
+      } else {
+        pixels = 0x80;                    
+        if (col == 7){
+          pixels = pixels | 0x01;        
+        }
+        if (board[y / 8][col] == 1 && y % 8 >= 2 && y % 8 <= 5){
+          pixels = pixels | 0x3C;        
+        }
+      }
+      send_data(pixels);
+    }
+  }
+
+  send_cmd(0x30);                          
+}
+
+
 void main(void)
 {
   DDRT = DDRT | RS_PIN | RW_PIN | E_PIN;       
