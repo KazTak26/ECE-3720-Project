@@ -13,3 +13,5 @@ static void debounce(void)
         _FEED_COP();
     }
 }
+
+/* Add SW5 definition and button debounce */
