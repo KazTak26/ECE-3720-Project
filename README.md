@@ -8,7 +8,7 @@ Cameron McIntosh
 
 Required Hardware:
 2 Dragon 12 Trainer Boards (with keypad attatchments)
-*Possibly Larger LCD
+LCD Module LY299 (ST2970 Chip)
 
 References: 
 
