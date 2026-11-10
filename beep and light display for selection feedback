@@ -1,0 +1,53 @@
+void beep(unsigned char times,
+          unsigned int length,
+          unsigned int gap)
+{
+    unsigned char t;
+    unsigned int i;
+
+    for (t = 0; t < times; t++) {
+        for (i = 0; i < length; i++) {
+            PTT ^= 0x20;
+            wait(1);
+        }
+
+        PTT &= 0xDF;
+
+        if (t < times - 1) {
+            wait(gap);
+        }
+    }
+}
+
+void feedback_miss(void)
+{
+    rgb(WHITE);
+    beep(1, 150, 0);
+    rgb(0);
+}
+
+void feedback_hit(void)
+{
+    rgb(RED);
+    beep(3, 80, 80);
+    rgb(0);
+}
+
+void feedback_sink(void)
+{
+    unsigned char i;
+
+    for (i = 0; i < 3; i++) {
+        rgb(RED);
+        beep(1, 250, 0);
+
+        rgb(0);
+        wait(150);
+    }
+}
+
+void feedback_gameover(void)
+{
+    rgb(RED);
+    beep(1, 600, 0);
+}
