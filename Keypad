@@ -1,0 +1,85 @@
+/* ECE 3720 BattleShip - one-board demo (game logic)
+ *
+ *   Boat 1: (1,1) (2,1)        Boat 2: (8,7) (8,8)
+ *   Boat 3: (3,4) (4,4) (5,4)  Boat 4: (6,1) (6,2) (6,3)
+ */
+#include <hidef.h>
+#include "derivative.h"
+
+unsigned char ships[8][8];    /* 0 = water, 1-4 = boat number */
+unsigned char shots[8][8];    /* 0 = not fired, 1 = miss, 2 = hit */
+unsigned char lives[4];       /* lives left for each boat */
+unsigned char boats_left;     /* boats still afloat */
+
+char keys[16] = {'1','4','7','*', '2','5','8','0', '3','6','9','#', 'A','B','C','D'};
+
+/* Returns the key pressed right now, or 0 if none */
+char read_key(void) {
+    unsigned char row, col, i;
+    unsigned char drive[4] = {0xFE, 0xFD, 0xFB, 0xF7};
+
+    for (row = 0; row < 4; row++) {
+        PORTA = drive[row];                  /* one row low */
+        for (i = 0; i < 10; i++);            /* let it settle */
+        for (col = 0; col < 4; col++) {
+            if ((PORTA & (0x10 << col)) == 0) {
+                return keys[row * 4 + col];
+            }
+        }
+    }
+    return 0;
+}
+
+/* Wait for a key press and release */
+char get_key(void) {
+    char k;
+
+    do {
+        k = read_key();
+        if (k == 0) wait(1);                 /* keep 7-seg and LEDs lit, 1 ms each */
+    } while (k == 0);
+    wait(20);                                /* debounce */
+    while (read_key() != 0) wait(1);         /* wait for release */
+    wait(20);
+    return k;
+}
+
+/* Wait for 1-8. Returns 1-8, or 0 if # was pressed */
+unsigned char get_number(void) {
+    char k;
+
+    for (;;) {
+        k = get_key();
+        if (k >= '1' && k <= '8') return (unsigned char)(k - '0');
+        if (k == '#') return 0;
+    }
+}
+
+
+/* SETUP: hidden boats in fixed places, empty grid  --- Fixed for DEMO*/
+void new_game(void) {
+    unsigned char r, c;
+
+    for (r = 0; r < 8; r++) {
+        for (c = 0; c < 8; c++) {
+            ships[r][c] = 0;
+            shots[r][c] = 0;
+        }
+    }
+
+    /* place the hidden boats: ships[row-1][column-1] */
+    ships[0][0] = 1;  ships[0][1] = 1;                     /* boat 1 */
+    ships[6][7] = 2;  ships[7][7] = 2;                     /* boat 2 */
+    ships[3][2] = 3;  ships[3][3] = 3;  ships[3][4] = 3;   /* boat 3 */
+    ships[0][5] = 4;  ships[1][5] = 4;  ships[2][5] = 4;   /* boat 4 */
+
+    lives[0] = 2;  lives[1] = 2;  lives[2] = 3;  lives[3] = 3;
+    boats_left = 4;
+
+    rgb(0);
+    draw_grid();
+    lcd_string(LINE1, "C:  R:  ");      /* top: target */
+    lcd_string(LINE2, "        ");      /* under it: hit / miss */
+    lcd_string(LINE3, "        ");
+    lcd_string(LINE4, "ATTACK! ");      /* bottom: state of the game */
+}
