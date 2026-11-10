@@ -1,0 +1,41 @@
+void show_display(void)
+{
+    PTP |= 0x0F;
+    PTJ |= 0x02;
+
+    if (digit == 0) {
+        PORTB = leds[boats_left];
+        PTJ &= 0xFD;
+    } else {
+        PORTB = bars[lives[digit - 1]];
+        PTP &= digit_on[digit - 1];
+    }
+
+    digit++;
+
+    if (digit > 4) {
+        digit = 0;
+    }
+}
+
+void wait(unsigned int ms)
+{
+    int i, j;
+
+    while (ms > 0) {
+        for (i = 0; i < 4; i++) {
+            show_display();
+
+            for (j = 0; j < 1000; j++) {
+            }
+        }
+
+        ms--;
+    }
+}
+
+void rgb(unsigned char color)
+{
+    PTP &= 0x8F;
+    PTP |= color;
+}
