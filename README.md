@@ -21,3 +21,4 @@ Attached PDF has the Claude Transcript used to create the flow chart
 
 [4] © Freescale Semiconductor, Inc., 2005. all rights reserved. (n.d.). https://www.nxp.com.cn/docs/en/application-note/AN2883.pdf
 
+[5] Rithvik-Vadlamani/battleship-game: Two-player embedded battleship in C for the MSPM0G3507, with an ST7735 LCD and English/Spanish text. GitHub. (n.d.). https://github.com/Rithvik-Vadlamani/Battleship-Game
